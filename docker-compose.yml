@@ -2,19 +2,29 @@ services:
   app:
     build: .
     image: imobiliaria-api
+    environment:
+      - NODE_ENV=production
+      - DOCKER_DB_NAME=${DOCKER_DB_NAME}
+      - DOCKER_DB_USER=${DOCKER_DB_USER}
+      - DOCKER_DB_PASSWORD=${DOCKER_DB_PASSWORD}
+      - DOCKER_DB_HOST=${DOCKER_DB_HOST}
     ports:
       - "3000:3000"
-    env_file:
-      - .env
     depends_on:
       - db
+    command: ["dockerize", "-wait", "tcp://db:5432", "-timeout", "30s", "node", "src/server.js"]
 
   db:
-    image: postgres:latest
-    env_file:
-      - .env
+    image: postgis/postgis:latest
+    environment:
+      - POSTGRES_USER=${DOCKER_DB_USER}
+      - POSTGRES_PASSWORD=${DOCKER_DB_PASSWORD}
+      - POSTGRES_DB=${DOCKER_DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./src/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
 
 volumes:
   db_data:

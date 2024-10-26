@@ -11,15 +11,20 @@ describe('Database Connection', () => {
     // Teste para garantir que a conexão com o banco de dados esteja autenticada
     it('A conexão com o banco de dados deve estar autenticada', async () => {
         await connect(); // Tenta conectar ao banco
+
+        const expectedDbName = process.env.NODE_ENV === 'production'
+            ? process.env.DOCKER_DB_NAME
+            : process.env.LOCAL_DB_NAME;
+
         expect(sequelize.authenticate).toBeDefined(); // Verifica se o método authenticate está definido
-        expect(sequelize.config.database).toEqual(process.env.DB_NAME); // Verifica se o nome do banco de dados está correto
+        expect(sequelize.config.database).toEqual(expectedDbName); // Verifica se o nome do banco de dados está correto
     });
 
     // Teste para verificar se a conexão falha com credenciais inválidas
     it('Deve lançar um erro se as credenciais do banco de dados estiverem incorretas', async () => {
         // Cria uma nova instância do Sequelize com credenciais inválidas
         const invalidSequelize = new Sequelize('invalid_db', 'invalid_user', 'invalid_password', {
-            host: process.env.DB_HOST, // Usa o host definido nas variáveis de ambiente
+            host: sequelize.config.host, // Usa o host configurado
             dialect: 'postgres', // Define o dialeto como postgres
             logging: false, // Desabilita logs
         });

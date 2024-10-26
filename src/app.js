@@ -26,6 +26,26 @@ app.use('/clientes', clienteRoutes);
 app.use('/fazendas', fazendaRoutes);
 app.use('/transacoes', transacaoRoutes);
 
+// Rota raiz '/'
+app.get('/', (req, res) => {
+    res.send(`
+      <div style="text-align: center;">
+        <h1>Desejo-lhe boas-vindas à API de Gestão de Fazendas!</h1>
+        <p><em><strong>Acesse: <a href="/api-docs">/api-docs</a> para a documentação completa e mais informações.</strong></em></p>
+      </div>
+    `);
+});
+
+// Middleware para rotas não encontradas (404)
+app.use((req, res, next) => {
+    res.status(404).send((`
+        <div style="text-align: center;">
+          <h1>Rota não encontrada, a URL solicitada não existe. Verifique o endereço e tente novamente.</h1>
+          <p><em><strong>Acesse: <a href="/api-docs">/api-docs</a> para a documentação completa e mais informações.</strong></em></p>
+        </div>
+      `));
+});
+
 // Middleware para tratamento de erros
 app.use((err, req, res, next) => {
     console.error(err.stack); 
