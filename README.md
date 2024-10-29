@@ -9,7 +9,8 @@ Esta é uma API para uma imobiliária que se especializa na compra e venda de fa
 4. [Endpoints da API](#endpoints-da-api)
 5. [Testes](#testes)
 6. [Conteinerização](#conteinerização)
-7. [Observações](#observações)
+7. [PostGIS e Banco de Dados](#postgis-e-banco-de-dados)
+8. [Observações](#observações)
 
 ## Tecnologias Utilizadas
 
@@ -33,9 +34,9 @@ Esta é uma API para uma imobiliária que se especializa na compra e venda de fa
 2. Docker e Docker Compose instalados.
 3. Clonar o repositório: 
     ```bash
-    git clone https://github.com/seu-usuario/seu-repositorio.git
+    git clone https://github.com/rayner27k/imobiliaria
 
-    cd seu-repositorio
+    cd imobiliaria
     ```
 
 ## Configuração do Ambiente
@@ -69,18 +70,21 @@ Esta é uma API para uma imobiliária que se especializa na compra e venda de fa
 
 ### Clientes
 - `GET /clientes`: Retorna todos os clientes.
+- `GET /clientes/:id`: Retorna um cliente específico pelo ID.
 - `POST /clientes`: Cria um novo cliente.
 - `PUT /clientes/:id`: Atualiza um cliente existente.
 - `DELETE /clientes/:id`: Remove um cliente.
 
 ### Fazendas
 - `GET /fazendas`: Retorna todas as fazendas.
+- `GET /fazendas/:id`: Retorna uma fazenda específica pelo ID.
 - `POST /fazendas`: Cria uma nova fazenda.
 - `PUT /fazendas/:id`: Atualiza uma fazenda existente.
 - `DELETE /fazendas/:id`: Remove uma fazenda.
 
 ### Transações
 - `GET /transacoes`: Retorna todas as transações.
+- `GET /transacoes/:id`: Retorna uma transação específica pelo ID.
 - `POST /transacoes`: Cria uma nova transação.
 - `PUT /transacoes/:id`: Atualiza uma transação existente.
 - `DELETE /transacoes/:id`: Remove uma transação.
@@ -106,11 +110,30 @@ A aplicação pode ser executada em um contêiner Docker. Para isso, siga os pas
      ```sh
      docker-compose up --build
      ```
+3. Para encerrar e remover os contêineres:
+     ```sh
+     docker-compose down
+     ```
 
 Isso iniciará a aplicação e o banco de dados PostgreSQL, utilizando as configurações definidas no arquivo `.env`.
+
+## PostGIS e Banco de Dados
+
+Esta API utiliza **PostGIS** para manipular dados de localização geográfica e espacial nas tabelas de fazendas. É importante garantir que o PostGIS está habilitado no banco de dados:
+
+1. No contêiner de banco de dados, execute:
+   ```sql
+   CREATE EXTENSION postgis;
+
+2. O campo `localizacao` é tratado como uma geometria no formato WKT `(POINT(lon lat))`, permitindo operações espaciais.
+
+### Conexão com o banco de dados
+
+- A aplicação se conecta ao banco PostgreSQL utilizando as variáveis definidas no `.env`. Em ambiente Docker, `DB_HOST` deve ser `db`; para ambiente local, use `localhost`.
 
 ## Observações
 
 - O arquivo `.dockerignore` deve incluir `node_modules`, `npm-debug.log`, `.env` e `coverage` para evitar que esses arquivos sejam copiados para o contêiner.
-- A variável `DB_HOST` no Docker Compose deve ser configurada como `db` para se conectar ao serviço de banco de dados.
 - Certifique-se de que o `PostGIS` está configurado corretamente no contêiner de banco de dados PostgreSQL.
+- Para demais informações a respeito do Docker, veja a [documentação oficial](https://docs.docker.com/) para detalhes adicionais.
+- Para consultas espaciais e uso de funções do PostGIS, veja a [documentação oficial](https://postgis.net/documentation/) para detalhes adicionais.

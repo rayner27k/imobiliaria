@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 // Define as rotas que utilizam o controlador de transações
 app.post('/transacao', transacaoController.createTransacao);
 app.get('/transacao', transacaoController.getAllTransacoes);
+app.get('/transacao/:id', transacaoController.getTransacaoById);
 app.put('/transacao/:id', transacaoController.updateTransacao);
 app.delete('/transacao/:id', transacaoController.deleteTransacao);
 
@@ -124,6 +125,28 @@ describe('Transacao Controller', () => {
 
             expect(res.statusCode).toEqual(500); // Verifica se o status da resposta é 500
             expect(res.body).toHaveProperty('error'); // Verifica a mensagem de erro
+        });
+    });
+
+    describe('getTransacaoById', () => {
+        it('should return a transaction by ID', async () => {
+            const transacao = { id: 1, cliente_id: 1, fazenda_id: 1, data_transacao: '2023-10-01', valor: 1000 };
+            Transacao.findByPk.mockResolvedValue(transacao); // Mock para simular transação encontrada
+
+            const res = await request(app).get('/transacao/1');
+
+            expect(res.statusCode).toEqual(200); // Verifica se o status é 200
+            expect(res.body).toEqual(transacao); // Verifica se a resposta contém a transação correta
+        });
+
+        it('should return 404 if transaction not found', async () => {
+            Transacao.findByPk.mockResolvedValue(null); // Simula transação não encontrada
+
+            const res = await request(app).get('/transacao/1');
+
+            expect(res.statusCode).toEqual(404); // Verifica se o status é 404
+            expect(res.body).toHaveProperty('error'); // Verifica se a resposta contém a mensagem de erro
+            expect(res.body.error).toBe('Transação não encontrada'); // Verifica a mensagem de erro específica
         });
     });
 

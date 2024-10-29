@@ -30,6 +30,39 @@ router.get('/', clienteController.getAllClientes); // Obtém todos os clientes
 
 /**
  * @swagger
+ * /clientes/{id}:
+ *   get:
+ *     summary: Retorna um cliente específico pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do cliente a ser retornado
+ *     responses:
+ *       200:
+ *         description: Dados do cliente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nome:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       404:
+ *         description: Cliente não encontrado
+ *       400:
+ *         description: ID inválido
+ */
+router.get('/:id', validateIdParam, clienteController.getClienteById); // Obtém um cliente específico
+
+/**
+ * @swagger
  * /clientes:
  *   post:
  *     summary: Cria um novo cliente
@@ -78,6 +111,8 @@ router.post('/', clienteController.createCliente); // Cria um novo cliente
  *         description: Cliente atualizado com sucesso
  *       404:
  *         description: Cliente não encontrado
+ *       400:
+ *         description: ID inválido
  */
 router.put('/:id', validateIdParam, clienteController.updateCliente); // Atualiza um cliente
 
@@ -98,7 +133,9 @@ router.put('/:id', validateIdParam, clienteController.updateCliente); // Atualiz
  *         description: Cliente deletado com sucesso
  *       404:
  *         description: Cliente não encontrado
+ *       400:
+ *         description: ID inválido
  */
 router.delete('/:id', validateIdParam, clienteController.deleteCliente); // Deleta um cliente
 
-module.exports = router; 
+module.exports = router;

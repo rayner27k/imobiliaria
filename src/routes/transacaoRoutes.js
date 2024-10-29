@@ -35,6 +35,42 @@ router.get('/', transacaoController.getAllTransacoes); // Obtém todas as transa
 
 /**
  * @swagger
+ * /transacoes/{id}:
+ *   get:
+ *     summary: Retorna uma transação específica pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID da transação a ser retornada
+ *     responses:
+ *       200:
+ *         description: Transação encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 cliente_id:
+ *                   type: integer
+ *                 fazenda_id:
+ *                   type: integer
+ *                 data_transacao:
+ *                   type: string
+ *                   format: date
+ *                 valor:
+ *                   type: number
+ *       404:
+ *         description: Transação não encontrada
+ */
+router.get('/:id', validateIdParam, transacaoController.getTransacaoById); // Obtém uma transação pelo ID
+
+/**
+ * @swagger
  * /transacoes:
  *   post:
  *     summary: Cria uma nova transação

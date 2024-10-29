@@ -32,6 +32,39 @@ router.get('/', fazendaController.getAllFazendas); // Obtém todas as fazendas
 
 /**
  * @swagger
+ * /fazendas/{id}:
+ *   get:
+ *     summary: Retorna uma fazenda específica pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID da fazenda a ser obtida
+ *     responses:
+ *       200:
+ *         description: Fazenda encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nome:
+ *                   type: string
+ *                 localizacao:
+ *                   type: string
+ *                 area:
+ *                   type: number
+ *       404:
+ *         description: Fazenda não encontrada
+ */
+router.get('/:id', validateIdParam, fazendaController.getFazendaById); // Obtém uma fazenda pelo ID
+
+/**
+ * @swagger
  * /fazendas:
  *   post:
  *     summary: Cria uma nova fazenda
@@ -107,4 +140,4 @@ router.put('/:id', validateIdParam, fazendaController.updateFazenda); // Atualiz
  */
 router.delete('/:id', validateIdParam, fazendaController.deleteFazenda); // Deleta uma fazenda
 
-module.exports = router; 
+module.exports = router;

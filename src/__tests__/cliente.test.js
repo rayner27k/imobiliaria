@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 app.post('/clientes', clienteController.createCliente);
 app.get('/clientes', clienteController.getAllClientes);
+app.get('/clientes/:id', clienteController.getClienteById);
 app.put('/clientes/:id', clienteController.updateCliente);
 app.delete('/clientes/:id', clienteController.deleteCliente);
 
@@ -71,6 +72,44 @@ describe('Cliente Controller', () => {
 
             expect(response.status).toBe(500); // Verifica se o status é 500
             expect(response.body.error).toBe('Erro ao obter clientes: Server error'); // Verifica a mensagem de erro
+        });
+    });
+
+    // Testes para o método getClienteById
+    describe('getClienteById', () => {
+        it('deve retornar um cliente pelo ID', async () => {
+            const cliente = { id: 1, nome: 'John Doe', email: 'john@example.com', telefone: '123456789' };
+            Cliente.findByPk.mockResolvedValue(cliente); // Simula a busca do cliente pelo ID
+
+            const response = await request(app).get('/clientes/1'); // Faz uma requisição GET para obter o cliente
+
+            expect(response.status).toBe(200); // Verifica se o status é 200
+            expect(response.body).toEqual(cliente); // Verifica se o corpo da resposta é igual ao cliente encontrado
+        });
+
+        it('deve retornar 404 se o cliente não for encontrado', async () => {
+            Cliente.findByPk.mockResolvedValue(null); // Simula que o cliente não foi encontrado
+
+            const response = await request(app).get('/clientes/999'); // Faz uma requisição GET para um cliente inexistente
+
+            expect(response.status).toBe(404); // Verifica se o status é 404
+            expect(response.body.error).toBe('Cliente não encontrado'); // Verifica a mensagem de erro
+        });
+
+        it('deve retornar 400 se o ID for inválido', async () => {
+            const response = await request(app).get('/clientes/abc'); // Faz uma requisição GET com um ID inválido
+
+            expect(response.status).toBe(400); // Verifica se o status é 400
+            expect(response.body.error).toBe('ID inválido: deve ser um número inteiro'); // Verifica a mensagem de erro
+        });
+
+        it('deve retornar 500 se houver um erro no servidor', async () => {
+            Cliente.findByPk.mockRejectedValue(new Error('Server error')); // Simula um erro no servidor
+
+            const response = await request(app).get('/clientes/1'); // Faz uma requisição GET
+
+            expect(response.status).toBe(500); // Verifica se o status é 500
+            expect(response.body.error).toBe('Erro ao buscar cliente: Server error'); // Verifica a mensagem de erro
         });
     });
 

@@ -8,6 +8,7 @@ app.use(express.json());
 
 app.post('/fazendas', fazendaController.createFazenda);
 app.get('/fazendas', fazendaController.getAllFazendas);
+app.get('/fazendas/:id', fazendaController.getFazendaById);
 app.put('/fazendas/:id', fazendaController.updateFazenda);
 app.delete('/fazendas/:id', fazendaController.deleteFazenda);
 
@@ -70,6 +71,36 @@ describe('Fazenda Controller', () => {
 
             expect(response.status).toBe(500); // Verifica se o status da resposta é 500
             expect(response.body.error).toBe('Erro ao obter fazendas: Server error'); // Verifica a mensagem de erro
+        });
+    });
+
+    describe('getFazendaById', () => {
+        it('should return a fazenda by ID', async () => {
+            const fazenda = { id: 1, nome: 'Fazenda Teste', localizacao: 'POINT(1 1)', area: 100 };
+            Fazenda.findByPk.mockResolvedValue(fazenda);
+
+            const response = await request(app).get('/fazendas/1');
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(fazenda);
+        });
+
+        it('should return 404 if fazenda is not found', async () => {
+            Fazenda.findByPk.mockResolvedValue(null);
+
+            const response = await request(app).get('/fazendas/1');
+
+            expect(response.status).toBe(404);
+            expect(response.body.error).toBe('Fazenda não encontrada');
+        });
+
+        it('should return 500 if there is a server error', async () => {
+            Fazenda.findByPk.mockRejectedValue(new Error('Server error'));
+
+            const response = await request(app).get('/fazendas/1');
+
+            expect(response.status).toBe(500);
+            expect(response.body.error).toBe('Erro ao obter fazenda: Server error');
         });
     });
 
